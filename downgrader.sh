@@ -199,7 +199,7 @@ To prevent Steam from automatically updating this game in the future, it is reco
 to make appmanifest_$app_id.acf read-only in the Steam library's steamapps folder
 
 For example:
-    chmod a-w \"$library/appmanifest_$app_id.acf\"
+    chmod a-w \"$library/steamapps/appmanifest_$app_id.acf\"
 "
 
     # Clean up steamCMD mess
