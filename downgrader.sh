@@ -31,25 +31,29 @@ fi
 game_path=""
 downgrader_working_dir=""
 
-# Method 1: Read libraryfolders.vdf
-library_file="$HOME/.steam/root/steamapps/libraryfolders.vdf"
-if [[ -f "$library_file" ]]; then
-    mapfile -t library_paths < <(grep -oP '"path"\s+"\K[^"]+' "$library_file")
+vdf_files=(
+    "$HOME/.steam/root/steamapps/libraryfolders.vdf"
+    "$HOME/.var/app/com.valvesoftware.Steam/.steam/root/steamapps/libraryfolders.vdf"
+    "$HOME/snap/steam/common/.steam/root/steamapps/libraryfolders.vdf"
+)
 
-    for library in "${library_paths[@]}"; do
-        candidate="$library/steamapps/common/$game_folder_name"
-        candidate_appmanifest="$library/steamapps/appmanifest_$app_id.acf"
-        if [[ -d "$candidate" && -f "$candidate_appmanifest" ]]; then
+for library_file in "${vdf_files[@]}"; do
+    if [[ -f "$library_file" ]]; then
+        mapfile -t library_paths < <(grep -oP '"path"\s+"\K[^"]+' "$library_file")
+
+        for library in "${library_paths[@]}"; do
+            candidate="$library/steamapps/common/$game_folder_name"
+            candidate_appmanifest="$library/steamapps/appmanifest_$app_id.acf"
+
+            if [[ -d "$candidate" && -f "$candidate_appmanifest" ]]; then
                 game_path="$candidate"
                 downgrader_working_dir="$library/steamapps/common/steam_downgrader"
-            break
-        fi
-    done
-fi
-if [[ -z "$game_path" ]]; then
-    echo "Didnt find steam library."
-    # TODO check if .steam/root method works with flatpak steam
-fi
+                break 2
+            fi
+        done
+    fi
+done
+
 
 #Update user on game found
 if [[ -n "$game_path" ]]; then
@@ -60,6 +64,11 @@ else
 fi
 
 downgrade_game() {
+    # Check SteamCMD prerequisites
+    if [[ ! -e /lib/ld-linux.so.2 ]]; then
+        echo "SteamCMD requires 32-bit glibc"
+        exit 1
+    fi
     # Warn user about downgrading
     echo "
 Warning: This script will replace your $display_name installation with the selected downgraded version
@@ -103,17 +112,8 @@ This script will download a full new copy of $display_name, this may take some t
     tar zxf steamcmd_linux.tar.gz
     rm steamcmd_linux.tar.gz
 
-    # check steamCMD dependencies
-    missing="$(ldd steamCMD/linux32/steamcmd 2>&1 | grep "not found" || true)"
-
-    if [[ -n "$missing" ]]; then
-        echo "SteamCMD is missing required libraries:"
-        echo "$missing"
-        exit 1
-    fi
-
     # Authenticate steamCMD
-    echo "Enter your steam username (for use of valve's steamCMD): "
+    echo "Enter your steam username (for authenticating valve's steamCMD): "
     read -r steam_username
     "$downgrader_working_dir"/steamCMD/steamcmd.sh "+login" "$steam_username" "+quit"
 
