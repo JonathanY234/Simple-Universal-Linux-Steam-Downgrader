@@ -1,0 +1,59 @@
+# =================Game Specific Variables======================
+display_name="Skyrim Special Edition"
+game_folder_name="Skyrim Special Edition"
+app_id="489830"
+
+versions=(
+    "1.5.97" "1.6.640" "1.6.1170"
+)
+notes=(
+    "The pre-anniversary update" "Commonly used version" "Version before the latest update"
+)
+depot_ids=(
+    "489831" "489832" "489833"
+)
+manifest_ids=( 
+    "7848722008564294070 8702665189575304780 2289561010626853674"
+    "3660787314279169352 2756691988703496654 5291801952219815735"
+    "8442952117333549665 8042843504692938467 1914580699073641964"
+)
+# ==============================================================
+
+
+# =================Game Specific Variables======================
+display_name="Half-Life"
+game_folder_name="Half-Life"
+app_id="70"
+
+versions=(
+    "19 August 2020"
+)
+notes=(
+    "The pre 25th anniversary update"
+)
+depot_ids=(
+    "1" "3" "71" "96" "8"
+)
+manifest_ids=(
+    "5928322771446233610 8096513071444961518 9183617604528345869 8007990985538868417 8088891443299905514"
+)
+# ==============================================================
+
+# =================Game Specific Variables======================
+display_name="Fallout 4"
+game_folder_name="Fallout 4"
+app_id="377160"
+
+versions=(
+    "19 August 2020"
+)
+notes=(
+    "The pre next gen update"
+)
+depot_ids=(
+    "377161" "377162" "377163"
+)
+manifest_ids=(
+    "7497069378349273908 5847529232406005096 5819088023757897745"
+)
+# ==============================================================
