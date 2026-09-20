@@ -6,6 +6,7 @@ app_id="489830"
 versions=(
     "1.5.97" "1.6.640" "1.6.1170"
 )
+steamcmd_plus_depots_size_estimate=16300033947 # ~15.2 GiB
 notes=(
     "The pre-anniversary update" "Commonly used version" "Version before the latest update"
 )
@@ -27,6 +28,7 @@ app_id="377160"
 versions=(
     "19 August 2020"
 )
+steamcmd_plus_depots_size_estimate=0 # need to measure this
 notes=(
     "The pre next gen update"
 )
@@ -46,6 +48,7 @@ app_id="70"
 versions=(
     "19 August 2020"
 )
+steamcmd_plus_depots_size_estimate=0 # need to measure this
 notes=(
     "The pre 25th anniversary update"
 )

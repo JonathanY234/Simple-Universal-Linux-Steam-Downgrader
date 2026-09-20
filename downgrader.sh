@@ -9,8 +9,9 @@ app_id="489830"
 versions=(
     "1.5.97" "1.6.640" "1.6.1170"
 )
+steamcmd_plus_depots_size_estimate=16300033947 # ~15.2 GiB
 notes=(
-    "The pre-anniversary update" "Commonly used version" "Version before the latest update"
+    "The pre-anniversary update" "Commonly used version" "Version before August 2026 update"
 )
 depot_ids=(
     "489831" "489832" "489833"
@@ -96,8 +97,15 @@ This script will download a full new copy of $display_name, this may take some t
         echo "Invalid choice"
         exit 1
     fi
-
     version_index=$((version_choice - 1))
+
+    # Check avaliable disk space
+    available_space=$(df --output=avail -B1 "$downgrader_working_dir" | tail -n 1)
+
+    if (( available_space < steamcmd_plus_depots_size_estimate )); then
+        echo "Insufficient free disk space for depots. Required space $(( steamcmd_plus_depots_size_estimate / 1024**3 )) GiB, available space $(( available_space / 1024**3 )) GiB"
+        exit 1
+    fi
 
     # Download steamCMD from valve
     steamCMD_url="https://client-update.steamstatic.com/installer/steamcmd_linux.tar.gz"
@@ -157,6 +165,8 @@ This script will download a full new copy of $display_name, this may take some t
         fi
     done
 
+    exit 0
+
     # Make backup
     backup_dir="$downgrader_working_dir/${game_folder_name}-backup-$(date +%Y-%m-%d_%H-%M-%S)"
     mkdir "$backup_dir"
@@ -191,6 +201,8 @@ This script will download a full new copy of $display_name, this may take some t
         if ! merge_depot "$depot_location" "$game_path"; then
             echo "Failed to downgrade game"
             do_restore_backup "$backup_dir"
+            echo "Restored Backup"
+            exit 1
         fi
     done
     echo "Game installation downgraded successfully"
