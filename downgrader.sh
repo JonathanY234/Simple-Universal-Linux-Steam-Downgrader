@@ -207,11 +207,14 @@ This script will download a full new copy of $display_name, this may take some t
     done
     echo "Game installation downgraded successfully"
     echo "
-To prevent Steam from automatically updating this game in the future, it is recommended 
-to make appmanifest_$app_id.acf read-only in the Steam library's steamapps folder
+To prevent Steam from automatically updating this game in the future, it is recommended
+to make appmanifest_$app_id.acf immutable.
 
 For example:
-    chmod a-w \"$library/steamapps/appmanifest_$app_id.acf\"
+    sudo chattr +i \"$library/steamapps/appmanifest_$app_id.acf\"
+
+To allow Steam to update the game again, remove the immutable attribute:
+    sudo chattr -i \"$library/steamapps/appmanifest_$app_id.acf\"
 "
 
     # Clean up steamCMD mess
