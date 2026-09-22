@@ -55,8 +55,7 @@ for library_file in "${vdf_files[@]}"; do
     fi
 done
 
-
-#Update user on game found
+# Update user on game found
 if [[ -n "$game_path" ]]; then
     echo "Found game installation at: $game_path"
 else
@@ -84,7 +83,7 @@ This script will download a full new copy of $display_name, this may take some t
         exit 0
     fi
 
-    # User choose version
+    # Let user choose version
     echo "Available versions:"
     for i in "${!versions[@]}"; do
         echo "[$((i + 1))] ${versions[$i]}          ${notes[$i]}"
@@ -107,7 +106,7 @@ This script will download a full new copy of $display_name, this may take some t
         exit 1
     fi
 
-    # Download steamCMD from valve
+    # Download steamCMD from Valve
     steamCMD_url="https://client-update.steamstatic.com/installer/steamcmd_linux.tar.gz"
     steamCMD_sha="cebf0046bfd08cf45da6bc094ae47aa39ebf4155e5ede41373b579b8f1071e7c" # SHA found from steam flathub package. It has been stable for >8 years, might one day change
 
@@ -151,7 +150,7 @@ This script will download a full new copy of $display_name, this may take some t
     done
     wait "$steamcmd_pid"
 
-    # check download succeeded
+    # Check download succeeded
     for i in "${!depot_ids[@]}"; do
         depot_location="$downgrader_working_dir/steamCMD/linux32/steamapps/content/app_$app_id/depot_${depot_ids[$i]}"
 
@@ -164,8 +163,6 @@ This script will download a full new copy of $display_name, this may take some t
             exit 1
         fi
     done
-
-    exit 0
 
     # Make backup
     backup_dir="$downgrader_working_dir/${game_folder_name}-backup-$(date +%Y-%m-%d_%H-%M-%S)"
@@ -194,6 +191,7 @@ This script will download a full new copy of $display_name, this may take some t
         done
     }
 
+    # Move depots to game folder
     mkdir -p "$game_path"
     for i in "${!depot_ids[@]}"; do
         depot_location="$downgrader_working_dir/steamCMD/linux32/steamapps/content/app_$app_id/depot_${depot_ids[$i]}"
@@ -234,7 +232,6 @@ choose_backup_folder() {
         backup_dir="${backups[0]}"
     else
         echo "Multiple backups found:"
-
         for i in "${!backups[@]}"; do
             echo "[$((i + 1))] ${backups[$i]}"
         done
