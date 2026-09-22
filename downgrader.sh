@@ -74,8 +74,8 @@ downgrade_game() {
     echo "
 Warning: This script will replace your $display_name installation with the selected downgraded version
 This will remove any mods installed directly into the game folder. Mods managed by a mod manager will generally not be removed, but may need to be redeployed
-A backup of your original game folder will be created automatically for safety
-This script will download a full new copy of $display_name, this may take some time and will require sufficient free space in your Steam library drive for both (it can be reclaimed afterwards)
+A backup of your original game folder will be created automatically for safety (it can be removed afterwards)
+This script will download a full new copy of $display_name, this may take some time
 "
 
     read -r -p "Continue? [y/N] " answer
@@ -100,7 +100,7 @@ This script will download a full new copy of $display_name, this may take some t
     version_index=$((version_choice - 1))
 
     # Check avaliable disk space
-    available_space=$(df --output=avail -B1 "$downgrader_working_dir" | tail -n 1)
+    available_space=$(df --output=avail -B1 "$library" | tail -n 1)
 
     if (( available_space < steamcmd_plus_depots_size_estimate )); then
         echo "Insufficient free disk space for depots. Required space $(( steamcmd_plus_depots_size_estimate / 1024**3 )) GiB, available space $(( available_space / 1024**3 )) GiB"
