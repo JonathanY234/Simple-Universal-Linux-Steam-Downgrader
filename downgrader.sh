@@ -11,7 +11,7 @@ versions=(
 )
 steamcmd_plus_depots_size_estimate=16300033947 # ~15.2 GiB
 notes=(
-    "The pre-anniversary update" "Commonly used version" "Version before August 2026 update"
+    "The pre-anniversary update" "Commonly used version" "Version before the latest update"
 )
 depot_ids=(
     "489831" "489832" "489833"
@@ -64,24 +64,29 @@ else
 fi
 
 downgrade_game() {
-    # Check SteamCMD prerequisites
-    if [[ ! -e /lib/ld-linux.so.2 ]]; then
-        echo "SteamCMD requires 32-bit glibc"
-        exit 1
-    fi
+
     # Warn user about downgrading
     echo "
 Warning: This script will replace your $display_name installation with the selected downgraded version
 This will remove any mods installed directly into the game folder. Mods managed by a mod manager will generally not be removed, but may need to be redeployed
-A backup of your original game folder will be created automatically for safety (it can be removed afterwards)
 This script will download a full new copy of $display_name, this may take some time
 "
 
-    read -r -p "Continue? [y/N] " answer
-    if [[ ! "$answer" =~ ^([Yy]|[Yy][Ee][Ss])$ ]]; then
-        echo "Cancelled"
-        exit 0
-    fi
+
+    read -rp "Do you want to create a full game backup (Recommended)? It can be removed afterwards. [y/n]: " choice
+
+    case "${choice,,}" in
+        y|yes)
+            want_backup=true
+            ;;
+        n|no)
+            want_backup=false
+            ;;
+        *)
+            echo "Invalid Option. Exiting"
+            exit 1
+            ;;
+    esac
 
     # Let user choose version
     echo "Available versions:"
@@ -106,6 +111,11 @@ This script will download a full new copy of $display_name, this may take some t
         exit 1
     fi
 
+    # Check SteamCMD prerequisites
+    if [[ ! -e /lib/ld-linux.so.2 ]]; then
+        echo "SteamCMD requires 32-bit glibc"
+        exit 1
+    fi
     # Download steamCMD from Valve
     steamCMD_url="https://client-update.steamstatic.com/installer/steamcmd_linux.tar.gz"
     steamCMD_sha="cebf0046bfd08cf45da6bc094ae47aa39ebf4155e5ede41373b579b8f1071e7c" # SHA found from steam flathub package. It has been stable for >8 years, might one day change
@@ -165,14 +175,18 @@ This script will download a full new copy of $display_name, this may take some t
     done
 
     # Make backup
-    backup_dir="$downgrader_working_dir/${game_folder_name}-backup-$(date +%Y-%m-%d_%H-%M-%S)"
-    mkdir "$backup_dir"
-    if mv "$game_path" "$backup_dir"; then
-        echo "Game installation backed up successfully"
+    if [[ $want_backup == "true" ]]; then
+        backup_dir="$downgrader_working_dir/${game_folder_name}-backup-$(date +%Y-%m-%d_%H-%M-%S)"
+        mkdir "$backup_dir"
+        if mv "$game_path" "$backup_dir"; then
+            echo "Game installation backed up successfully"
+        else
+            echo "Failed to create backup"
+            echo "The original game installation has not been modified"
+            exit 1
+        fi
     else
-        echo "Failed to create backup"
-        echo "The original game installation has not been modified"
-        exit 1
+        rm -rf "$game_path"
     fi
 
     merge_depot() {
@@ -198,8 +212,10 @@ This script will download a full new copy of $display_name, this may take some t
 
         if ! merge_depot "$depot_location" "$game_path"; then
             echo "Failed to downgrade game"
-            do_restore_backup "$backup_dir"
-            echo "Restored Backup"
+            if [[ $want_backup == "true" ]]; then
+                do_restore_backup "$backup_dir"
+                echo "Restored Backup"
+            fi
             exit 1
         fi
     done
